@@ -120,5 +120,5 @@ jobs:
       - name: Deploy to EKS
         run: |
           cd ./k8s/
-          cp /etc/kubernetes/admin.conf ~/.kube/config
+          kubectl get svc -v=10
           kustomize build | kubectl apply -f - --validate=false
