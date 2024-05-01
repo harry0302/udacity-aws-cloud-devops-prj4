@@ -113,4 +113,4 @@ jobs:
           aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
           cd k8s/
           kustomize edit set image backend=$ECR_REGISTRY/$ECR_REPOSITORY:${GITHUB_SHA::7}
-          kustomize build | kubectl apply -f -
+          kustomize build | kubectl apply -f - --validate=false
