@@ -410,3 +410,13 @@ kustomize build | kubectl apply -f -
 ## License
 
 [License](LICENSE.md)
+
+## Frontend URL
+```
+http://aa72c28ba6b72409c8bed27fcf02c1c5-1770374815.us-east-1.elb.amazonaws.com/
+```
+
+## Backend URL
+```
+http://9b174701fe8c44a085abdb2a4be7b55-1128302061.us-east-1.elb.amazonaws.com/
+```
