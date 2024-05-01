@@ -1,9 +1,13 @@
 name: Backend Continuous Deployment
 
 on:
-  push:
+  pull_request:
+    types:
+      - closed
     branches:
       - main
+    paths:
+      - 'starter/backend/**'
 
   workflow_dispatch:
 
@@ -14,7 +18,7 @@ defaults:
 jobs:
   lint:
     name: 'Lint'
-    if: (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true) || github.event_name == 'workflow_dispatch'
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     steps:
@@ -35,7 +39,7 @@ jobs:
         run: pipenv run lint
   test:
     name: 'Test'
-    if: (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true) || github.event_name == 'workflow_dispatch'
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     steps:
@@ -59,7 +63,7 @@ jobs:
   build:
     name: 'Build'
     needs: [lint, test]
-    if: success() && ((github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true) || github.event_name == 'workflow_dispatch')
+    if: success() && (github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch')
 
     runs-on: ubuntu-latest
     env:
