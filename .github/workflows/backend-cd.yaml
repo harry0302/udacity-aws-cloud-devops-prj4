@@ -106,6 +106,11 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${GITHUB_SHA::7} .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:${GITHUB_SHA::7}
 
+      - name: Configure kubectl
+        run: |
+          mkdir -p ~/.kube
+          aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+
       - name: Install kustomize
         uses: imranismail/setup-kustomize@v2
 
@@ -114,6 +119,5 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
           cd ./k8s/
-          aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
           kustomize edit set image backend=$ECR_REGISTRY/$ECR_REPOSITORY:${GITHUB_SHA::7}
           kustomize build | kubectl apply -f - --validate=false
