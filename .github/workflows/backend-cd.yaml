@@ -67,7 +67,11 @@ jobs:
     needs: [lint, test]
     if: success() &&  (github.event.pull_request.merged == true  || github.event_name == 'workflow_dispatch' || github.event_name == 'push')
     runs-on: ubuntu-latest
-    
+    # Permission can be added at job level or workflow level    
+    permissions:
+      id-token: write   # This is required for requesting the JWT
+      contents: read    # This is required for actions/checkout
+
     env:
         IMAGE_NAME: 'movie-catalog'
         EKS_CLUSTER_NAME: 'cluster'
@@ -111,6 +115,5 @@ jobs:
         run: |
           cd ./k8s/
           aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
-          kubectl config current-context
           kustomize edit set image backend=$ECR_REGISTRY/$ECR_REPOSITORY:${GITHUB_SHA::7}
           kustomize build | kubectl apply -f - --validate=false
