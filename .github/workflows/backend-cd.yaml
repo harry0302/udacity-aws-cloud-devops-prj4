@@ -1,11 +1,10 @@
 name: Backend Continuous Deployment
 
 on:
-  pull_request:
-    types:
-      - closed
-  
-  # Manual trigger using the workflow_dispatch event
+  push:
+    branches:
+      - main
+
   workflow_dispatch:
 
 defaults:
@@ -15,7 +14,7 @@ defaults:
 jobs:
   lint:
     name: 'Lint'
-    if: github.event.pull_request.merged == true  || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    if: (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     steps:
@@ -36,7 +35,7 @@ jobs:
         run: pipenv run lint
   test:
     name: 'Test'
-    if: github.event.pull_request.merged == true  || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    if: (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     steps:
@@ -60,13 +59,9 @@ jobs:
   build:
     name: 'Build'
     needs: [lint, test]
-    if: success() &&  (github.event.pull_request.merged == true  || github.event_name == 'workflow_dispatch' || github.event_name == 'push')
-    runs-on: ubuntu-latest
-    # Permission can be added at job level or workflow level    
-    permissions:
-      id-token: write   # This is required for requesting the JWT
-      contents: read    # This is required for actions/checkout
+    if: success() && ((github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true) || github.event_name == 'workflow_dispatch')
 
+    runs-on: ubuntu-latest
     env:
         IMAGE_NAME: 'movie-catalog'
         EKS_CLUSTER_NAME: 'cluster'
