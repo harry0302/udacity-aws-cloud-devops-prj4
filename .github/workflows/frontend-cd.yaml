@@ -7,11 +7,6 @@ on:
 
   # Manual trigger using the workflow_dispatch event
   workflow_dispatch:
-    push:
-      branches:
-        - main
-      paths:
-        - 'starter/frontend/**'
 
 defaults:
   run:
@@ -125,4 +120,5 @@ jobs:
       - name: Deploy to EKS
         run: |
           cd ./k8s/
+          cp /etc/kubernetes/admin.conf ~/.kube/config
           kustomize build | kubectl apply -f - --validate=false

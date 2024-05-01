@@ -7,11 +7,6 @@ on:
   
   # Manual trigger using the workflow_dispatch event
   workflow_dispatch:
-    push:
-      branches: 
-        - main
-      paths:
-        - 'starter/backend/**'
 
 defaults:
   run:
@@ -114,10 +109,15 @@ jobs:
       - name: Install kustomize
         uses: imranismail/setup-kustomize@v2
 
+      - name: Change docker image version
+        run: |
+          cd ./k8s/
+          kustomize edit set image backend=$ECR_REGISTRY/$ECR_REPOSITORY:${GITHUB_SHA::7}
+
       - name: Deploy to EKS
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
           cd ./k8s/
-          kustomize edit set image backend=$ECR_REGISTRY/$ECR_REPOSITORY:${GITHUB_SHA::7}
+          cp /etc/kubernetes/admin.conf ~/.kube/config
           kustomize build | kubectl apply -f - --validate=false
