@@ -108,9 +108,6 @@ jobs:
           mkdir -p ~/.kube
           aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
 
-      - name: Install kustomize
-        uses: imranismail/setup-kustomize@v2
-
       - name: Deploy to EKS
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
